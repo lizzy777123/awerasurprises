@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Texas Federal Tax Calculator 2024</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2em auto; max-width: 700px; padding: 1em; background: #f4f4f4; }
+    label, select, input { display: block; width: 100%; margin-top: 0.5em; }
+    button { margin-top: 1.5em; padding: 0.7em 1.2em; font-size: 1em; }
+    .result { margin-top: 2em; background: #e0ffe0; padding: 1em; border-radius: 5px; }
+  </style>
+</head>
+<body>
+
+<h1>Texas Federal Tax Calculator 2024</h1>
+
+<form id="taxForm">
+  <label for="filingStatus">Filing Status:</label>
+  <select id="filingStatus">
+    <option value="single">Single - Standard Deduction: $14,600</option>
+    <option value="married_joint">Married Filing Jointly - Standard Deduction: $29,200</option>
+    <option value="married_separate">Married Filing Separately - Standard Deduction: $14,600</option>
+    <option value="head_household">Head of Household - Standard Deduction: $21,900</option>
+  </select>
+
+  <label for="grossIncome">Gross Income ($):</label>
+  <input type="number" id="grossIncome" required />
+
+  <!-- Example input for deductions and credits -->
+<label for="fedTaxPaid">Federal Tax Already Paid ($):</label>
+<input type="number" id="fedTaxPaid" min="0" step="0.01" placeholder="Enter positive amount" />
+
+<label for="studentLoanInterest">Student Loan Interest Deduction ($):</label>
+<input type="number" id="studentLoanInterest" min="0" step="0.01" placeholder="Enter positive amount" />
+
+<label for="otherDeductions">Other Deductions ($):</label>
+<input type="number" id="otherDeductions" min="0" step="0.01" placeholder="Enter positive amount" />
+
+<label for="otherCredits">Other Tax Credits ($):</label>
+<input type="number" id="otherCredits" min="0" step="0.01" placeholder="Enter positive amount" />
+
+<label for="childTaxCredits">Number of Children for Child Tax Credit:</label>
+<input type="number" id="childTaxCredits" min="0" step="1" value="0" />
+
+  <button type="submit">Calculate Tax</button>
+</form>
+
+<div class="result" id="result" style="display:none;"></div>
+
+
+
+  
+<script>
+
+const fedTaxPaid = parseFloat(document.getElementById('fedTaxPaid').value) || 0;
+const studentLoanInterest = parseFloat(document.getElementById('studentLoanInterest').value) || 0;
+const otherDeductions = parseFloat(document.getElementById('otherDeductions').value) || 0;
+const otherCredits = parseFloat(document.getElementById('otherCredits').value) || 0;
+const numberOfChildren = parseInt(document.getElementById('childTaxCredits').value) || 0;
+
+// Treat these as deductions/credits by subtracting them:
+taxableIncome -= studentLoanInterest + otherDeductions;
+
+// Calculate child tax credit (assume $2,000 per child for example)
+const childTaxCreditAmount = numberOfChildren * 2000;
+
+// Total credits:
+const totalCredits = fedTaxPaid + otherCredits + childTaxCreditAmount;
+
+// Final tax owed:
+let finalTax = taxOwed - totalCredits;
+
+
+
+
+  
+const standardDeductions = {
+  single: 14600,
+  married_joint: 29200,
+  married_separate: 14600,
+  head_household: 21900
+};
+
+const taxBrackets = {
+  single: [
+    { min: 0, max: 11000, rate: 0.10 },
+    { min: 11000, max: 44725, rate: 0.12 },
+    { min: 44725, max: 95375, rate: 0.22 },
+    { min: 95375, max: 182100, rate: 0.24 },
+    { min: 182100, max: 231250, rate: 0.32 },
+    { min: 231250, max: 578125, rate: 0.35 },
+    { min: 578125, max: Infinity, rate: 0.37 }
+  ],
+  married_joint: [
+    { min: 0, max: 22000, rate: 0.10 },
+    { min: 22000, max: 89450, rate: 0.12 },
+    { min: 89450, max: 190750, rate: 0.22 },
+    { min: 190750, max: 364200, rate: 0.24 },
+    { min: 364200, max: 462500, rate: 0.32 },
+    { min: 462500, max: 693750, rate: 0.35 },
+    { min: 693750, max: Infinity, rate: 0.37 }
+  ],
+  married_separate: [
+    { min: 0, max: 11000, rate: 0.10 },
+    { min: 11000, max: 44725, rate: 0.12 },
+    { min: 44725, max: 95375, rate: 0.22 },
+    { min: 95375, max: 182100, rate: 0.24 },
+    { min: 182100, max: 231250, rate: 0.32 },
+    { min: 231250, max: 346875, rate: 0.35 },
+    { min: 346875, max: Infinity, rate: 0.37 }
+  ],
+  head_household: [
+    { min: 0, max: 15700, rate: 0.10 },
+    { min: 15700, max: 59850, rate: 0.12 },
+    { min: 59850, max: 95350, rate: 0.22 },
+    { min: 95350, max: 182100, rate: 0.24 },
+    { min: 182100, max: 231250, rate: 0.32 },
+    { min: 231250, max: 578100, rate: 0.35 },
+    { min: 578100, max: Infinity, rate: 0.37 }
+  ]
+};
+
+function updateStandardDeductionDisplay() {
+  const status = document.getElementById("filingStatus").value;
+  const deductionType = document.getElementById("deductionType").value;
+  const display = document.getElementById("standardDeductionDisplay");
+  if (deductionType === "standard") {
+    display.innerHTML = `<p><strong>Standard Deduction:</strong> $${standardDeductions[status].toLocaleString()}</p>`;
+  } else {
+    display.innerHTML = "";
+  }
+}
+
+document.getElementById("deductionType").addEventListener("change", function () {
+  const isItemized = this.value === "itemized";
+  document.getElementById("itemizedContainer").style.display = isItemized ? "block" : "none";
+  updateStandardDeductionDisplay();
+});
+
+document.getElementById("filingStatus").addEventListener("change", function () {
+  updateStandardDeductionDisplay();
+});
+
+document.getElementById("taxForm").addEventListener("submit", function (e) {
+  e.preventDefault();
+
+  const status = document.getElementById("filingStatus").value;
+  const income = parseFloat(document.getElementById("grossIncome").value);
+  const taxPaid = parseFloat(document.getElementById("taxPaid").value);
+  const deductionType = document.getElementById("deductionType").value;
+  const itemized = parseFloat(document.getElementById("itemizedDeductions").value);
+  const loan = parseFloat(document.getElementById("studentLoanInterest").value);
+  const children = parseInt(document.getElementById("childTaxCredits").value);
+  const otherCredits = parseFloat(document.getElementById("otherCredits").value);
+
+  const stdDeduction = standardDeductions[status];
+  const deduction = deductionType === "standard" ? stdDeduction : itemized;
+
+  const taxableIncome = Math.max(0, income - deduction - loan);
+
+  const brackets = taxBrackets[status];
+  let tax = 0, remaining = taxableIncome;
+
+  for (let b of brackets) {
+    if (remaining > 0 && taxableIncome > b.min) {
+      const incomeInBracket = Math.min(b.max - b.min, remaining);
+      tax += incomeInBracket * b.rate;
+      remaining -= incomeInBracket;
+    }
+  }
+
+  const ssTax = Math.min(income, 168600) * 0.062;
+  const medicareTax = income * 0.0145;
+
+  const childCredit = children * 2000;
+  const totalCredits = childCredit + otherCredits;
+  const totalTax = Math.max(0, tax + ssTax + medicareTax - totalCredits);
+  const finalTax = Math.max(0, totalTax - taxPaid);
+
+  const result = document.getElementById("result");
+  result.style.display = "block";
+  result.innerHTML = `
+    <h2>Results</h2>
+    <p><strong>Taxable Income:</strong> $${taxableIncome.toFixed(2)}</p>
+    <p><strong>Federal Income Tax:</strong> $${tax.toFixed(2)}</p>
+    <p><strong>Social Security Tax:</strong> $${ssTax.toFixed(2)}</p>
+    <p><strong>Medicare Tax:</strong> $${medicareTax.toFixed(2)}</p>
+    <p><strong>Total Credits (Child + Other):</strong> $${totalCredits.toFixed(2)}</p>
+    <p><strong>Tax Paid:</strong> $${taxPaid.toFixed(2)}</p>
+    <h3>Final Tax Owed: $${finalTax.toFixed(2)}</h3>
+  `;
+});
+</script>
+</body>
+</html>

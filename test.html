@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Texas Federal Tax Calculator 2025</title>
+<style>
+  body { font-family: Arial, sans-serif; max-width: 600px; margin: 2em auto; padding: 1em; background: #f9f9f9; }
+  h1 { text-align: center; }
+  label { display: block; margin-top: 1em; font-weight: bold; }
+  input[type="number"], select { width: 100%; padding: 0.5em; margin-top: 0.3em; }
+  button { margin-top: 1.5em; padding: 0.7em 1.2em; font-size: 1em; }
+  .result { margin-top: 2em; background: #e0ffe0; padding: 1em; border-radius: 5px; }
+</style>
+</head>
+<body>
+
+<h1>Texas Federal Tax Calculator 2025</h1>
+
+<form id="taxForm">
+
+  <label for="filingStatus">Filing Status:</label>
+  <select id="filingStatus" required>
+    <option value="single">Single</option>
+    <option value="married_joint">Married Filing Jointly</option>
+    <option value="married_separate">Married Filing Separately</option>
+    <option value="head_household">Head of Household</option>
+  </select>
+
+  <label for="grossIncome">Gross Income ($):</label>
+  <input type="number" id="grossIncome" min="0" step="0.01" required />
+
+  <label for="deductions">Deductions ($):</label>
+  <input type="number" id="deductions" min="0" step="0.01" placeholder="Standard or Itemized" required />
+
+  <label for="taxCredits">Tax Credits ($):</label>
+  <input type="number" id="taxCredits" min="0" step="0.01" value="0" />
+
+  <button type="submit">Calculate Tax</button>
+</form>
+
+<div class="result" id="result" style="display:none;"></div>
+
+<script>
+  const bracketsByStatus = {
+    single: [
+      { min: 0, max: 11000, rate: 0.10 },
+      { min: 11000, max: 44725, rate: 0.12 },
+      { min: 44725, max: 95375, rate: 0.22 },
+      { min: 95375, max: 182100, rate: 0.24 },
+      { min: 182100, max: 231250, rate: 0.32 },
+      { min: 231250, max: 578125, rate: 0.35 },
+      { min: 578125, max: Infinity, rate: 0.37 }
+    ],
+    married_joint: [
+      { min: 0, max: 22000, rate: 0.10 },
+      { min: 22000, max: 89450, rate: 0.12 },
+      { min: 89450, max: 190750, rate: 0.22 },
+      { min: 190750, max: 364200, rate: 0.24 },
+      { min: 364200, max: 462500, rate: 0.32 },
+      { min: 462500, max: 693750, rate: 0.35 },
+      { min: 693750, max: Infinity, rate: 0.37 }
+    ],
+    married_separate: [
+      { min: 0, max: 11000, rate: 0.10 },
+      { min: 11000, max: 44725, rate: 0.12 },
+      { min: 44725, max: 95375, rate: 0.22 },
+      { min: 95375, max: 182100, rate: 0.24 },
+      { min: 182100, max: 231250, rate: 0.32 },
+      { min: 231250, max: 346875, rate: 0.35 },
+      { min: 346875, max: Infinity, rate: 0.37 }
+    ],
+    head_household: [
+      { min: 0, max: 15700, rate: 0.10 },
+      { min: 15700, max: 59850, rate: 0.12 },
+      { min: 59850, max: 95350, rate: 0.22 },
+      { min: 95350, max: 182100, rate: 0.24 },
+      { min: 182100, max: 231250, rate: 0.32 },
+      { min: 231250, max: 578100, rate: 0.35 },
+      { min: 578100, max: Infinity, rate: 0.37 }
+    ]
+  };
+
+  document.getElementById('taxForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const filingStatus = document.getElementById('filingStatus').value;
+    const grossIncome = parseFloat(document.getElementById('grossIncome').value);
+    const deductions = parseFloat(document.getElementById('deductions').value);
+    const taxCredits = parseFloat(document.getElementById('taxCredits').value);
+
+    if (isNaN(grossIncome) || isNaN(deductions) || isNaN(taxCredits)) {
+      alert("Please enter valid numbers.");
+      return;
+    }
+
+    let taxableIncome = grossIncome - deductions;
+    taxableIncome = taxableIncome < 0 ? 0 : taxableIncome;
+
+    const brackets = bracketsByStatus[filingStatus];
+
+    let taxOwed = 0;
+    let remainingIncome = taxableIncome;
+
+    for (const bracket of brackets) {
+      if (taxableIncome > bracket.min) {
+        const incomeInBracket = Math.min(remainingIncome, bracket.max - bracket.min);
+        taxOwed += incomeInBracket * bracket.rate;
+        remainingIncome -= incomeInBracket;
+        if (remainingIncome <= 0) break;
+      }
+    }
+
+    const finalTax = Math.max(0, taxOwed - taxCredits);
+
+    // Show result
+    const resultDiv = document.getElementById('result');
+    resultDiv.style.display = 'block';
+    resultDiv.innerHTML = `
+      <h2>Tax Calculation Result</h2>
+      <p><strong>Taxable Income:</strong> $${taxableIncome.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+      <p><strong>Federal Tax Before Credits:</strong> $${taxOwed.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+      <p><strong>Tax Credits Applied:</strong> $${taxCredits.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+      <p><strong><u>Final Federal Tax Owed:</u></strong> $${finalTax.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+      <p style="font-size: 0.9em; color: #666;">*Texas has no state income tax; this is a federal estimate only.</p>
+    `;
+  });
+</script>
+
+</body>
+</html>

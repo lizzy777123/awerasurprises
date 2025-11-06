@@ -1,0 +1,13 @@
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME}.html -f
+RewriteRule ^(.*)$ $1.html [NC,L]
+
+
+
+RewriteEngine On
+# Redirect "home" to "index.html"
+RewriteRule ^home$ /index.html [L]
+
+# Load index.html when the root URL is accessed
+DirectoryIndex index.html
+

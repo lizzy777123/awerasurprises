@@ -1,0 +1,5 @@
+﻿{
+  "Description": "Domain ownership verification file for Microsoft 365 - place in the website root",
+  "Domain": "aweravisuals.com",
+  "Id": "7e658bbc-80c8-4016-b337-053a9f6e4236"
+}
