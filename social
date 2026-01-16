@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Short Video Embedsfor Smart</title>
+</head>
+
+
+<body>
+  <h2>YouTube Shorts (Autoplay & Muted)</h2>
+  <iframe 
+    width="315" 
+    height="560" 
+    src="https://youtube.com/shorts/yA7YlZEOK-k?si=ZLh2Ylqwr7mF2EGF/embed/SHORT_VIDEO_ID?autoplay=1&mute=1&loop=1&playlist=SHORT_VIDEO_ID" 
+    title="YouTube Shorts Video" 
+    frameborder="0" 
+    allow="autoplay; encrypted-media" 
+    allowfullscreen>
+  </iframe>
+
+
+<b>
+  <h2>TikTok Video</h2>
+  <blockquote class="tiktok-embed" cite="https://www.tiktok.com/t/ZThradobg/" data-video-id="VIDEO_ID" style="width: 325px; height: 570px;">
+    <section></section>
+  </blockquote>
+  <script async src="https://www.tiktok.com/embed.js"></script>
+
+
+<b>
+  <h2>Instagram Reel</h2>
+  <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/reel/DTlV0POkYUB/?igsh=MXJqMGY1b2RmZGR5Mg==" data-instgrm-version="14" style="width: 325px; height: 570px;">
+  </blockquote>
+  <script async src="//www.instagram.com/embed.js"></script>
+</body>
+</html>
